@@ -1,0 +1,59 @@
+#! /bin/bash
+
+echo "Welcome to PizzDATA!"
+echo -e "What size of pizza would you like?\nS30$\nM=37$\nL=42$"
+S=30
+M=37
+L=42
+declare -i total=0
+declare bill
+
+#check for input + size of pizza
+while ((c < 1))
+do
+	read psize
+	case $psize in
+		"S"|"s"|"M"|"m"|"L"|"l" )
+			total=$(( total+$"${psize^^}" ))
+			bill=$( echo "Pizza size:" "${psize^^}" $total"$\n" );
+			c=$(( c + 1 ))
+		;;
+		* )	echo "Size must be S M or L!";;
+	esac
+done
+
+#take the toppings and their prices from the file
+awk -F '::' '{ print NR " "$1" ----- "$2"$" }' Toppings
+echo "You can chose up to 4 toppings:"
+
+while ((i < 4))
+do
+	read topp
+	if [[ "$topp" != [1-6] ]]; then
+		echo "Enter from 1 to 6"
+#	check if the user has not entered the same topping
+	elif [[ $checker != *@($topp)* ]]; then
+		price=$( awk -v t=$topp -F '::' 'NR==t {print $2}' Toppings )
+		bill+=$( awk -v t=$topp -F '::' 'NR==t {print ""$1": "$2"$\\n" }' Toppings )
+		total=$(( total + price ))
+		checker+=$topp
+		i=$(( i + 1 ))
+	else
+		echo "You've already chosen this topping. Please, enter another one:"
+	fi
+done
+echo -e "$bill"
+echo "Youe total price: " $total'$'
+
+
+
+
+
+
+
+
+
+
+
+
+
